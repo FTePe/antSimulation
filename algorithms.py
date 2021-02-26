@@ -4,11 +4,16 @@ from ant import *
 def algorithm1(ant, path1, path2):
     if not path1 and not path2:
         ant.uturn()
-    if not ant.fed:  # ant is unfed
-        if not path1.foraging_pheromone and not path2.foraging_pheromone: #scouting
+
+    if not ant.fed:
+        # ant is unfed
+        if not path1.foraging_pheromone and not path2.foraging_pheromone:
+            # and is exploring
             ant.navigation = "alternative+directional"
             ant.lay_pheromone = "exploration"
-        else: #following foraging route
+        else:
+            #following foraging route
+            check = path_max(path1, path2, foraging_pheromone)
             if path1.foraging_pheromone > path2.foraging_pheromone:
                 check = path1
             else:
