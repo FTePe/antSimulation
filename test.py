@@ -28,24 +28,24 @@ for i in paths:
 
 
 # print("ant location : ", ant.location, "speed = ", ant.speed)
-
+nest = (0, 1)
 food = (2, 1)
 
 
 def flow(env):
     count = 0
-    nest = (0, 1)
     while count < 4:
-        yield env.timout(15)
+        yield env.timeout(random.randint(5,10))
         # add ant
-        new_ant = Ant(nest, count)
+        # new_ant = Ant(nest, count)
+
+        env.process(ant_simulation(env, count))
         count += 1
-        env.process(ant_simulation(env, new_ant))
 
 
-def ant_simulation(env, ant):
+def ant_simulation(env, id):
     # Maybe add something at the beginning of the process to control how ants are entering the maze
-
+    ant = Ant(nest, id)
     while ant.location != food:
 
         # When arriving at an intersection, the ant has to make a choice

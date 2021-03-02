@@ -1,0 +1,27 @@
+Test
+    Leave as is
+
+Task 1 easy
+Simulation
+    new file
+    clean version of test
+    build a flow function that obeys equations 4 and 5 (from our report)
+
+    make sure intersections and paths are passed well
+
+
+Task 2 medium
+Maze
+    Build maze based on intersections
+    where each intersection stores the paths it has (including their lengths, angles, intersection at end)
+
+Task 3 medium
+Algorithm
+    refactor for intersections
+        given some paths - maybe and the location of an ant?
+Ant
+    refactor for intersections
+
+
+
+

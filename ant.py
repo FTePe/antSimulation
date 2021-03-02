@@ -16,7 +16,7 @@ class Ant:
         # Not sure which is more useful
         self.location = nest  # where the ant is
         #We should add the speed too
-        self.speed = np.random.normal(v_mean,v_sd)
+        self.speed = np.random.normal(v_mean, v_sd)
         self.navigation = "default"
 
     def path_to_nest(self, angle):

@@ -12,10 +12,11 @@ def path_max(path1, path2, method):
         return "unknown method"
 
 
-def algorithm1(ant, path1, path2):
-    if not path1 and not path2:
+def algorithm1(ant, paths= []):
+    if not path1 and not path2:  # better way
         ant.uturn()
-
+    path1 = paths[0]
+    path2 = paths[1]
     if not ant.fed:
         # ant is unfed
         if not path1.foraging_pheromone and not path2.foraging_pheromone:
