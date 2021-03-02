@@ -1,3 +1,4 @@
+
 class Path:
     def __init__(
             self,
@@ -13,6 +14,9 @@ class Path:
         self.location = location  # location of the path
         self.parents = parents  # structure of paths
         self.children = []
+        
+        #Shouldn't we add a path lenght ?
+        self.length = 1
 
     def add_child(self, path):
         self.children.append(path)
