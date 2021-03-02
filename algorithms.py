@@ -1,6 +1,17 @@
 from ant import *
 
 
+def path_max(path1, path2, method):
+    if method == "foraging_pheromone":
+        if path1.foraging_pheromone > path2.foraging_pheromone:
+            check = path1
+        else:
+            check = path2
+        return check
+    else:
+        return "unknown method"
+
+
 def algorithm1(ant, path1, path2):
     if not path1 and not path2:
         ant.uturn()
@@ -13,11 +24,7 @@ def algorithm1(ant, path1, path2):
             ant.lay_pheromone = "exploration"
         else:
             #following foraging route
-            check = path_max(path1, path2, foraging_pheromone)
-            if path1.foraging_pheromone > path2.foraging_pheromone:
-                check = path1
-            else:
-                check = path2
+            check = path_max(path1, path2, "foraging_pheromone")
             if ant.override(check):
                 ant.navigation = "directional"
             else:
@@ -37,6 +44,8 @@ def algorithm1(ant, path1, path2):
             else:
                 ant.navigation = "foraging pheromone"
         ant.lay_pheromone = "foraging"
+
+
 
 
 def algorithm2(ant, path1, path2):

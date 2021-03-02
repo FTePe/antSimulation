@@ -5,14 +5,13 @@ Created on Tue Mar  2 16:33:48 2021
 @author: moi
 """
 
-#Test file
+# Test file
 
 from ant import *
 from maze import *
 from algorithms import *
 import simpy
 
-ant = Ant()
 
 test_structure = np.array([
         [0, 1, 0],  # path to nest
@@ -20,37 +19,54 @@ test_structure = np.array([
         [0, 1, 0]  # path to food
     ])
     
-a = create_maze(test_structure)
-for i in a:
-    print("Parent location : ",a[i].location)
+paths = create_maze(test_structure)
+for i in paths:
+    print("Parent location : ", paths[i].location)
     print("Children : ")
-    for child in a[i].children:
+    for child in paths[i].children:
         print(child.location)
 
-nest = (0,1)
-food = (2,1)
-ant.path = a[nest]
 
-print("ant location : ", ant.path.location, "speed = ", ant.speed)
+# print("ant location : ", ant.location, "speed = ", ant.speed)
 
+food = (2, 1)
 
 
-def ant_simulation(env):
-    #Maybe add something at the beginning of the process to control how ants are entering the maze
-    while ant.path != food:
-        #When arriving at an intersection, the ant has to make a choice
-        current = ant.path
-        path1 = current.children[0]
-        path2 = current.children[1]
-        algorithm1(ant,path1,path2)
-        #Then we don't care about the ant until it reaches the new intersection
-        travelling_time = ant.path.length*ant.speed
+def flow(env):
+    count = 0
+    nest = (0, 1)
+    while count < 4:
+        yield env.timout(15)
+        # add ant
+        new_ant = Ant(nest, count)
+        count += 1
+        env.process(ant_simulation(env, new_ant))
+
+
+def ant_simulation(env, ant):
+    # Maybe add something at the beginning of the process to control how ants are entering the maze
+
+    while ant.location != food:
+
+        # When arriving at an intersection, the ant has to make a choice
+        # current = paths[ant.location]
+        # path1 = current.children[0]
+        # path2 = current.children[1]
+        # algorithm1(ant, path1, path2)
+        ant.location = (ant.location[0]+1, ant.location[1])
+        # Then we don't care about the ant until it reaches the new intersection
+        # new = paths[ant.location]
+        # travelling_time = new.length*ant.speed
+        travelling_time = 15
+        print('ant: ', ant.id, ant.location, env.now)
         yield env.timeout(travelling_time)
 
+
 env = simpy.Environment()
-#We can probably loop here to get the number of ants we want
-env.process(ant_simulation(env))
-#Run the simulation
+# We can probably loop here to get the number of ants we want
+
+env.process(flow(env))
+# Run the simulation
 env.run()
 
 

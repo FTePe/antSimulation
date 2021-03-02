@@ -5,16 +5,19 @@ from parameters import *
 
 class Ant:
     def __init__(
-            self
+            self,
+            nest,
+            name
     ):
+        self.id = name
         self.fed = 0
         self.lay_pheromone = None
         self.nest_angle = 0
         # Not sure which is more useful
-        self.location = (0,0)  # where the ant is
-        self.path = None  # what path the ant is on
+        self.location = nest  # where the ant is
         #We should add the speed too
         self.speed = np.random.normal(v_mean,v_sd)
+        self.navigation = "default"
 
     def path_to_nest(self, angle):
         return abs(180*self.fed + angle - self.nest_angle)
@@ -23,9 +26,9 @@ class Ant:
         # checks the path is heading in desired direction
         return self.path_to_nest(path.angle) > phi_max
 
-    def navigate(self, method, path1, path2):
+    def navigate(self, path1, path2):
         # determines which path is chosen dependant on the navigation method
-        if method == "directional":
+        if self.navigation == "directional":
             angle1 = self.path_to_nest(path1.angle)
             angle2 = self.path_to_nest(path2.angle)
             if angle1 == angle2:
@@ -35,7 +38,7 @@ class Ant:
             else:
                 return angle1 > angle2
 
-        if method == "foraging pheromone":
+        if self.navigation == "foraging pheromone":
             p1 = (k + path1.foraging_pheromone)**alpha
             p2 = (k + path2.foraging_pheromone)**alpha
 
@@ -44,7 +47,7 @@ class Ant:
             else:
                 return 1
 
-        if method == "alternative":
+        if self.navigation == "alternative":
             p1 = (k + path1.exploration_pheromone) ** alpha
             p2 = (k + path2.exploration_pheromone) ** alpha
 
@@ -53,7 +56,7 @@ class Ant:
             else:
                 return 1
 
-        if method == "alternative+directional":
+        if self.navigation == "alternative+directional":
             angle1 = self.path_to_nest(path1.angle)
             angle2 = self.path_to_nest(path2.angle)
             if angle1 == angle2:
@@ -72,6 +75,6 @@ class Ant:
             else:
                 return 1
 
-        return "method not known"
+        return "unknown method"
 
 
