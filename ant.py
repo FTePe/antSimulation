@@ -1,4 +1,5 @@
 import random
+import numpy as np
 from parameters import *
 
 
@@ -12,6 +13,8 @@ class Ant:
         # Not sure which is more useful
         self.location = (0,0)  # where the ant is
         self.path = None  # what path the ant is on
+        #We should add the speed too
+        self.speed = np.random.normal(v_mean,v_sd)
 
     def path_to_nest(self, angle):
         return abs(180*self.fed + angle - self.nest_angle)
