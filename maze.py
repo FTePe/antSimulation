@@ -14,6 +14,8 @@ def create_maze(m_map, m_paths={}):
         else:
             parents = []
         m_paths[loc] = Path(angle, loc, parents)
+        for parent_loc in parents:
+            m_paths[parent_loc].add_child(m_paths[loc])
     return m_paths
 
 
@@ -36,6 +38,7 @@ def test():
         [1, 0, 1],  # path, path
         [0, 1, 0]  # path to food
     ])
+    
     test_structure = np.array([
         [0, 0, 0, 1, 0, 0, 0],
         [0, 0, 1, 0, 1, 0, 0],
@@ -45,6 +48,7 @@ def test():
         [0, 0, 1, 0, 1, 0, 0],
         [0, 0, 0, 1, 0, 0, 0]
     ])
+    
     a = create_maze(test_structure)
     print(a)
     for i in a:
