@@ -13,6 +13,9 @@ class Ant:
         self.location = (0,0)  # where the ant is
         self.path = None  # what path the ant is on
 
+    def path_to_nest(self, angle):
+        return abs(180*self.fed + angle - self.nest_angle)
+
     def override(self, path):
         # checks the path is heading in desired direction
         return self.path_to_nest(path.angle) > phi_max
@@ -68,5 +71,4 @@ class Ant:
 
         return "method not known"
 
-    def path_to_nest(self, angle):
-        return abs(180*self.fed + angle - self.nest_angle)
+
