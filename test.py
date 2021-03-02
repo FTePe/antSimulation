@@ -10,7 +10,7 @@ Created on Tue Mar  2 16:33:48 2021
 from ant import *
 from maze import *
 from algorithms import *
-#import simpy
+import simpy
 
 ant = Ant()
 
@@ -47,6 +47,10 @@ def ant_simulation(env):
         travelling_time = ant.path.length*ant.speed
         yield env.timeout(travelling_time)
 
-
+env = simpy.Environment()
+#We can probably loop here to get the number of ants we want
+env.process(ant_simulation(env))
+#Run the simulation
+env.run()
 
 
