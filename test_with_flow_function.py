@@ -2,9 +2,11 @@
 
 from ant import *
 from maze import *
-from algorithms import *
+from algorithm1 import *
 import simpy
 import math
+import numpy as np
+from tower_of_hanoi import *
 
 test_structure = np.array([
     [0, 0, 0, 1, 0, 0, 0],
@@ -15,12 +17,12 @@ test_structure = np.array([
     [0, 0, 1, 0, 1, 0, 0],
     [0, 0, 0, 1, 0, 0, 0]
 ])
-
 paths = create_maze(test_structure)
 
 
 nest = (0, 3)
 food = (6, 3)
+
 
 # #Based on Eq.4, time step interval 1s
 # r = 0.008 # not known, fraction of foraging ant
@@ -49,7 +51,7 @@ food = (6, 3)
 
 #Based on Eq.5
 F = []
-num_ants = 1000
+num_ants = 100
 def flow(env):
     count = 1
 
@@ -79,14 +81,9 @@ def ant_simulation(env, id):
         # When arriving at an intersection, the ant has to make a choice
         current = paths[ant.location]
         child_path = []
-        child_path_location = []
         for i,e in enumerate(current.children):
             child_path.append(current.children[i])
-            child_path_location.append(current.children[i].location)
-
-
-        # algorithm1(ant, child_path)
-        ant.location = random.choice(child_path_location)
+        ant.location = algorithm1(ant, child_path).location
 
         new = paths[ant.location]
         travelling_time = new.length/ant.speed
@@ -99,7 +96,7 @@ env = simpy.Environment()
 
 
 env.process(flow(env))
-# Run the simulation
+
 env.run()
 
 
