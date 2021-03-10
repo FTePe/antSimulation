@@ -1,3 +1,5 @@
+import numpy as np
+
 class Path:
     def __init__(self, name, length=0, start_angle=0, end_angle=0):
         self.name = name
@@ -9,11 +11,21 @@ class Path:
         
     def reverse(self):
         length_reverse = self.length
-        start_angle_reverse = self.end_angle-180
-        end_angle_reverse = self.start_angle-180
+        start_sign = np.sign(self.start_angle)
+        if start_sign == 0:
+            start_sign = 1
+            
+        end_sign = np.sign(self.end_angle)
+        if end_sign == 0:
+            end_sign = 1
+        start_angle_reverse = self.end_angle-180*end_sign
+        end_angle_reverse = self.start_angle-180*start_sign
         path_reverse = Path(str(self.name)+'_reverse', length_reverse,start_angle_reverse, end_angle_reverse)
         return path_reverse
         
+        
+    def isequal(self,path):
+        return self.name == path.name
         
     def __str__(self):
         return 'Path '+str(self.name)
@@ -26,7 +38,7 @@ class Intersection:
     
 
     def __str__(self):
-        return str(self.id) + ' adjacent: ' + str([x.id for x in self.adjacent])
+        return str(self.id) #+ ' adjacent: ' + str([x.id for x in self.adjacent])
 
     def add_neighbor(self, neighbor, path):
         self.adjacent[neighbor] = path
@@ -48,6 +60,12 @@ class Intersection:
         for neighbor in self.get_connections():
             paths.append(self.get_path(neighbor))
         return paths
+    
+    def get_neighbor(self,path):
+        for neighbor in self.get_connections():
+            if self.get_path(neighbor).isequal(path):
+                return neighbor
+        return "Neighbor corresponding to path not found"
     
     def isequal(self,intersection):
         return self.get_id() == intersection.get_id()
@@ -83,6 +101,22 @@ class Maze:
             self.add_intersection(to)
         self.inter_dict[frm].add_neighbor(self.inter_dict[to], path)
         self.inter_dict[to].add_neighbor(self.inter_dict[frm], path.reverse())
+    
+    def remove_connection(self,int1,int2):
+        del int1.adjacent[int2]
+        del int2.adjacent[int1]
+        
+        
+    
+    def get_all_paths(self):
+        paths = []
+        for name_inter in self.get_intersections():
+            inter = self.get_intersection(name_inter)
+            paths_inter = inter.get_all_paths()
+            for path in paths_inter:
+                paths.append(path)
+        return paths
+                
 
     def get_intersections(self):
         return self.inter_dict.keys()
@@ -141,9 +175,12 @@ if __name__ == '__main__':
     g.show()
     inter = g.get_intersection('top')
     for neighbor in inter.get_connections():
-        print(type(neighbor))
+        print(type(inter.get_path(neighbor)))
         print(neighbor.isequal(inter))
     print(inter.isequal(inter))
+    
+    for path in g.get_all_paths():
+        print(path)
 
 
         

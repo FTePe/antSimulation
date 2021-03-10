@@ -1,5 +1,5 @@
 from igraph import *
-from tower_of_hanoi import *
+from maze_generation import *
 
 
 size = 3
@@ -31,8 +31,9 @@ def generate_picture(maze,nb_vertices):
     return g
 
 
-hanoi = mirror_hanoi(size)
+#hanoi = mirror_hanoi(size)
 #hanoi = tower_hanoi(size)
+hanoi = alternative_maze(size)
 #hanoi.show()
 g = generate_picture(hanoi,hanoi.num_intersections)
 

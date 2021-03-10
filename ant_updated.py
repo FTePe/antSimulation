@@ -17,14 +17,17 @@ class Ant:
         self.fed = 0
         self.lay_pheromone = None
         self.nest_angle = 0
-        # Not sure which is more useful
-        self.location = nest  # where the ant is
-        #We should add the speed too
         self.speed = np.random.normal(v_mean, v_sd)
         self.navigation = "default"
 
     def path_to_nest(self, angle):
-        return abs(180*self.fed + angle - self.nest_angle)
+        return abs(180*self.fed-angle*np.sign(angle) - self.nest_angle)
+        """
+        if not self.fed:
+            return abs(angle - self.nest_angle)
+        else:
+            return abs(180-angle*np.sign(angle) - self.nest_angle)
+        """
 
     def override(self, path):
         # checks the path is heading in desired direction
@@ -38,14 +41,17 @@ class Ant:
             if angle1 == angle2:
                 return random.randint(0, 1)
             elif random.random() < p_angle:
-                return angle1 < angle2
-            else:
                 return angle1 > angle2
+            else:
+                return angle1 < angle2
 
-        if self.navigation == "foraging pheromone":
+        if self.navigation == "foraging pheromone" or self.navigation == "pheromone":
             p1 = (k + path1.foraging_pheromone)**alpha
             p2 = (k + path2.foraging_pheromone)**alpha
-
+            
+            #Always choose the path with most pheromones
+            #return p1 <= p2
+            
             if random.random() < p1/(p1+p2):
                 return 0
             else:
