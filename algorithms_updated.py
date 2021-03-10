@@ -169,3 +169,29 @@ def algorithm2(ant):
         
     return ant.current_inter, ant.next_inter, ant.current_inter.get_path(ant.next_inter)
 
+def algorithm3(ant):
+    paths = []
+    current = ant.current_inter
+    previous = ant.previous_inter
+    for neighbor in current.get_connections():
+        if not neighbor.isequal(previous):
+            path = current.get_path(neighbor)
+            paths.append(path)
+
+    if len(paths) > 2:
+        return "More than 2 options"
+
+    elif len(paths) == 1:
+        print("Only 1 option")
+        choice = paths[0]
+
+    elif len(paths) == 0:
+        ant.uturn()
+        print("U-turn")
+
+    else:
+        choice = paths[random.randint(0,1)]
+    ant.next_inter = current.get_neighbor(choice)
+
+    reverse_choice = ant.next_inter.get_path(ant.current_inter)
+    return ant.current_inter, ant.next_inter, ant.current_inter.get_path(ant.next_inter)
