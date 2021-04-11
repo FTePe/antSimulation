@@ -10,6 +10,9 @@ class Ant:
             name
     ):
         self.id = name
+        self.previous_inter
+        self.current_inter
+        self.next_inter
         self.fed = 0
         self.lay_pheromone = None
         self.nest_angle = 0

@@ -7,6 +7,17 @@ import simpy
 import math
 import numpy as np
 from tower_of_hanoi import *
+import matplotlib.pyplot as plt
+
+
+size = 2
+maze = mirror_hanoi(size)
+nest_name = 'up'+'-top'*size
+food_name = 'down'+'-bottom'*size
+nest = maze.get_intersection(nest_name)
+food = maze.get_intersection(food_name)
+print(nest)
+
 
 
 
@@ -37,7 +48,9 @@ from tower_of_hanoi import *
 
 #Based on Eq.5
 F = []
-num_ants = 3
+num_ants = 10
+
+
 def flow(env):
     count = 1
 
@@ -54,40 +67,94 @@ def flow(env):
                 print('ant: %d starts to explore maze at %d' %(count,env.now-time_step+i))
                 env.process(ant_simulation(env, count))
                 count += 1
-
-#Maze definition
-
-maze = mirror_hanoi(1)
-nest = maze.get_intersection('up-top')
-food = maze.get_intersection('down-top')
-print(nest)
+    evap.interrupt()
 
 
+def evaporation(env,maze):
+    go_on = True
+    while go_on:
+        try :
+            for path in maze.get_all_paths():
+                path.foraging_pheromone -= lambda_i*path.foraging_pheromone
+                path.exploration_pheromone -= lambda_i*path.exploration_pheromone
+                if path.foraging_pheromone < 0:
+                    path.foraging_pheromone = 0
+                if path.exploration_pheromone < 0:
+                    path.exploration_pheromone = 0
+            yield env.timeout(1) 
+            print('PHEROMONE')
+        except simpy.Interrupt:
+            print("END")
+            go_on = False
+
+#time_in_maze=np.zeros(num_ants+1)
+time_in_maze = []
 
 def ant_simulation(env, id):
-    # Maybe add something at the beginning of the process to control how ants are entering the maze
-    ant_start = env.now
+    
+    
     ant = Ant(nest, id)
-    print(ant.previous_inter)
+    ant_start = env.now
+    
+    #Ant moves to the food source
     while not ant.next_inter.isequal(food):#ant.location != food:
-        # When arriving at an intersection, the ant has to make a choice
+        #Update the position of the ant
         ant.previous_inter = ant.current_inter
         ant.current_inter = ant.next_inter
-        current_loc, next_loc, path = algorithm1(ant)
-        #print('current type = ',type(current_loc), 'next_ type = ',type(next_loc))
+        
+        #Look for the next position
+        current_loc, next_loc, path = algorithm2(ant)
+        
+        #Travel along the path
         travelling_time = path.length/ant.speed
-
-        print(' ant%s: heading from %s to %s using %s at time %.3f s'% (ant.id, ant.current_inter, ant.next_inter, path, env.now))
+        print('   ant%s: heading from %s to %s at time %.3f s'% (ant.id, ant.current_inter, ant.next_inter, env.now))
+        
         yield env.timeout(travelling_time)
-        print(' ant%s: arrived at %s at time %.3f s'% (ant.id, ant.next_inter, env.now))
-        #maze.show()
-    solving_time = env.now-ant_start
-    print(' ant%s: found the food source after %.3f s travelling at speed %.2f m/s'% (ant.id, solving_time, ant.speed))
+        
+    time_to_food = env.now-ant_start
+    print(' ant%s: FOUND the food source after %.3f s travelling at speed %.2f m/s'% (ant.id, time_to_food, ant.speed))
+    
+    #Reset the memory of the ant so that we can use the same path to go to the food source and come back
+    ant.previous_inter = food
+    ant.current_inter = food
+    
+    #ant is eating
+    yield env.timeout(t_f)
+    ant.fed = 1
+    
+    #Ant comes back to nest
+    while not ant.next_inter.isequal(nest):#ant.location != nest:
+        #Update the position of the ant
+        ant.previous_inter = ant.current_inter
+        ant.current_inter = ant.next_inter
+        
+        #Look for next position
+        current_loc, next_loc, path = algorithm2(ant)
+        
+        #Travel along the path
+        travelling_time = path.length/ant.speed
+        print('   ant%s: heading from %s to %s at time %.3f s'% (ant.id, ant.current_inter, ant.next_inter, env.now))
+        
+        yield env.timeout(travelling_time)
+        
+    time_to_come_back = env.now-ant_start
+    print(' ant%s: CAME BACK to nest after %.3f s travelling at speed %.2f m/s'% (ant.id, time_to_come_back, ant.speed))
+    #time_in_maze[id]=time_to_come_back
+    time_in_maze.append(time_to_come_back)
+
 
 
 env = simpy.Environment()
 
+evap = env.process(evaporation(env,maze))
 
 env.process(flow(env))
 
 env.run()
+
+mean = np.mean(time_in_maze)
+std = np.std(time_in_maze)
+print('Mean solving time = %.2f s, standard deviation = %.2f s' %(mean,std))
+
+plt.hist(time_in_maze,bins=10)
+plt.show()

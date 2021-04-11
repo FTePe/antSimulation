@@ -42,7 +42,7 @@ food = maze.get_intersection(food_name)
 
 #Based on Eq.5
 F = []
-num_ants = 100  
+num_ants = 1000  
 starting_time=[]
 
 def flow(env):
